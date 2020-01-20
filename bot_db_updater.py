@@ -8,19 +8,19 @@ import os
 from bs4 import BeautifulSoup
 from wowapi import WowApi
 
-#Загружаем старые данные, если они имеются
+# Downloading old data if you have it
 try:
 
     with open("dict_of_items.json", "r", encoding="utf=8") as item_id_in_file:
         item_id_in_file = json.load(item_id_in_file)
 
 except Exception as error:
-    print("Произошла ошибка, старые данные не будут загружены")
+    print("Error, old data can't be downloaded")
     print(traceback.format_exc())
     item_id_in_file = {}
 
 
-# Получаем актуальный список аукционов
+# Recieving actual auction list of items (for Ravencrest-eu realm in this example)
 try:
     api = WowApi('a2221c916652442bad3fbd0b1581a43d', '3QqAr3a7gJY2Q1PihAUAfwmuRA2SRQFy')
     wow = api.get_auctions('eu', 'ravencrest', locale='en_GB')
@@ -30,10 +30,10 @@ try:
         f.write(r.content)
 
 except Exception as error:
-    print("Произошла ошибка при загрузке данных из API")
+    print("Error occured while donwloading data from API")
     print(traceback.format_exc())
 
-# дополняем наш словарь новыми ключами, которых там нет
+# Adding missing keys to our dictionary
 with open("auctions-ravencrest.json", "r", encoding="utf=8") as item_compare_in_file:
     item_compare_in_file = json.load(item_compare_in_file)
 
@@ -47,13 +47,13 @@ try:
             item_id_in_file[item_id] = None
 
 except Exception as error:
-    print("Возникла ошибка, новые значения не были добавлены")
+    print("Error occured while trying to add new values")
     print(traceback.format_exc())
 
 with open ("dict_of_items.json", "w") as fp:
     json.dump(item_id_in_file, fp)
 
-# для тех ключей у которых нет значений находим имена на сайте
+# Finding names for keys with none-values using wowhead.com or wowdb.com
 def find_name_by_id(item_id):
     r=requests.get('https://www.wowdb.com/items/{}'.format(item_id))
     #r=requests.get('https://www.wowhead.com/item={}'.format(item_id))
@@ -66,7 +66,7 @@ with open("dict_of_items.json", "r", encoding="utf=8") as id_to_names_file:
 for key, value in id_to_name_data.items():
     try:
         if value is None:
-            print('У ключа {} нет значения, поэтому получим его'.format(key))
+            print("The key {} with out a value, so let's receive it".format(key))
             value = find_name_by_id(key)
             time.sleep(5)
             id_to_name_data[key]=value
@@ -74,8 +74,8 @@ for key, value in id_to_name_data.items():
             with open ("dict_of_items.json", "w") as fp:
                 json.dump(id_to_name_data, fp)
         else:
-            print('У ключа {} есть значение {}'.format(key,value))
+            print('The key {} has a value {}'.format(key,value))
     except requests.ConnectionError:
-        print('Проблемы с подключением к сети')
+        print('Error occured due to connection problems')
     except AttributeError:
-        print('Ошибка, что-то пошло не так на странице загрузки')
+        print('Error, something is wrong on the page')
