@@ -1,4 +1,5 @@
-World of Warcraft Telegram auction bot (LearnPython courses graduation project)
+World of Warcraft Telegram auction bot 
+(LearnPython courses graduation project)
 ======================================
 
 WoW Auc tg-bot is a simple bot for telegram, that parses WoW auction house lots information from auction house AP
